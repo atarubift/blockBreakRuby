@@ -9,8 +9,16 @@ GAME_INFO = {
 
 X_WIDTH = Window.width
 Y_HEIGHT = Window.height
+
 bar = Sprite.new(X_WIDTH / 2, Y_HEIGHT - 30, Image.new(30, 10, [255, 255, 255]))
-walls = [bar]
+walls = [Sprite.new(0, 50, Image.new(1, Y_HEIGHT - 50, C_BLACK)),
+         Sprite.new(0, 50, Image.new(X_WIDTH, 1, C_BLACK)),
+         Sprite.new(X_WIDTH - 1, 50, Image.new(1, Y_HEIGHT - 50, C_BLACK)),
+         bar]
+ball = Sprite.new(X_WIDTH / 2, Y_HEIGHT - 40, Image.new(10, 10).circle_fill(5, 5, 5, C_WHITE))
+dx = 3
+dy = -3
+
 Window.load_resources do
 
   Window.loop do
@@ -26,11 +34,26 @@ Window.load_resources do
       end
     when :playing
       if Input.key_down?(K_LEFT) && bar.x > 0
-        bar.x -= 3
+        bar.x -= 5 
       elsif Input.key_down?(K_RIGHT) && bar.x < (Window.width - 30)
-        bar.x += 3
+        bar.x += 5
       end
+      
       Sprite.draw(walls)
+
+      ball.x += dx
+      if ball === walls
+        ball.x -= dx
+        dx = -dx
+      end
+
+      ball.y += dy
+      if ball === walls
+        ball.y -= dy
+        dy = -dy
+      end
+
+      ball.draw
     end
   end
 end
