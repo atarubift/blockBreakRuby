@@ -10,14 +10,14 @@ GAME_INFO = {
 X_WIDTH = Window.width
 Y_HEIGHT = Window.height
 
-bar = Sprite.new(X_WIDTH / 2, Y_HEIGHT - 30, Image.new(30, 10, [255, 255, 255]))
+bar = Sprite.new(X_WIDTH / 2, Y_HEIGHT - 30, Image.new(50, 10, [255, 255, 255]))
 walls = [Sprite.new(0, 50, Image.new(1, Y_HEIGHT - 50, C_BLACK)),
          Sprite.new(0, 50, Image.new(X_WIDTH, 1, C_BLACK)),
          Sprite.new(X_WIDTH - 1, 50, Image.new(1, Y_HEIGHT - 50, C_BLACK)),
          bar]
 ball = Sprite.new(X_WIDTH / 2, Y_HEIGHT - 40, Image.new(10, 10).circle_fill(5, 5, 5, C_WHITE))
-dx = 3
-dy = -3
+dx = rand(1..5)
+dy = -1 * rand(3..6)
 image = Image.new(58, 18, C_WHITE)
 blocks = []
 7.times do |y|
@@ -43,7 +43,7 @@ Window.load_resources do
     when :playing
       if Input.key_down?(K_LEFT) && bar.x > 0
         bar.x -= 5 
-      elsif Input.key_down?(K_RIGHT) && bar.x < (Window.width - 30)
+      elsif Input.key_down?(K_RIGHT) && bar.x < (Window.width - 50)
         bar.x += 5
       end
       
@@ -81,6 +81,7 @@ Window.load_resources do
         if GAME_INFO[:life] > 0
           GAME_INFO[:life] -= 1
           ball.y = Y_HEIGHT - 40
+          dx = rand(1..5)
           dy = -dy
           GAME_INFO[:scene] = :title
         else GAME_INFO[:life] == 0
