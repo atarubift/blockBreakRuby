@@ -23,7 +23,7 @@ Window.load_resources do
 
   Window.loop do
     Window.draw_box_fill(0, 0, X_WIDTH, 50, [128, 128, 128] )
-    Window.draw_font(0, 25, "SCOER: #{GAME_INFO[:score]} LIFE: #{"●" * GAME_INFO[:life].to_i}", Font.default)
+    Window.draw_font(0, 25, "SCOER: #{GAME_INFO[:score]} LIFE: #{"●" * GAME_INFO[:life]}", Font.default)
     Window.draw_box_fill(0, 50, X_WIDTH, Y_HEIGHT, [0, 0, 0])
 
     case GAME_INFO[:scene]
@@ -53,7 +53,21 @@ Window.load_resources do
         dy = -dy
       end
 
+      if ball.y > Y_HEIGHT
+        if GAME_INFO[:life] > 0
+          GAME_INFO[:life] -= 1
+          ball.y = Y_HEIGHT - 40
+          dy = -dy
+          GAME_INFO[:scene] = :title
+        else GAME_INFO[:life] == 0
+          GAME_INFO[:scene] = :gameover
+        end
+      end
+
       ball.draw
+    when :gameover 
+      Window.draw_font((X_WIDTH / 5) * 2, (Y_HEIGHT - 50) / 3, "GAME OVER", Font.default)
+      Window.draw_font((X_WIDTH / 3) - 30, (Y_HEIGHT - 50) / 2, "RETRY:SPACE EXIT: ESC", Font.default)
     end
   end
 end
