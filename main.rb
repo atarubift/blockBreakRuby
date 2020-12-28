@@ -9,7 +9,8 @@ GAME_INFO = {
 
 X_WIDTH = Window.width
 Y_HEIGHT = Window.height
-
+bar = Sprite.new(X_WIDTH / 2, Y_HEIGHT - 30, Image.new(30, 10, [255, 255, 255]))
+walls = [bar]
 Window.load_resources do
 
   Window.loop do
@@ -24,7 +25,12 @@ Window.load_resources do
         GAME_INFO[:scene] = :playing
       end
     when :playing
-      Window.draw_font((X_WIDTH / 5) * 2, (Y_HEIGHT - 50) / 2, "Playing Now!", Font.default)
+      if Input.key_down?(K_LEFT) && bar.x > 0
+        bar.x -= 3
+      elsif Input.key_down?(K_RIGHT) && bar.x < (Window.width - 30)
+        bar.x += 3
+      end
+      Sprite.draw(walls)
     end
   end
 end
