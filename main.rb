@@ -75,7 +75,7 @@ end
 class Ball < Sprite
   def initialize
     x = X_WIDTH / 2
-    y = Y_HEIGHT - 40
+    y = Y_HEIGHT - 50 
     ball = Image.new(10, 10).circle_fill(5, 5, 5, C_WHITE)
     super(x, y, ball)
     @dx = rand(1..5)
@@ -93,9 +93,9 @@ class Ball < Sprite
     hit = self.check(blocks).first
     if hit != nil
       hit.vanish
-      p_ hit: self.hit
       self.x -= @dx
       @dx *= -1
+      GAME_INFO[:score] += 100
     end
 
     self.y += @dy
@@ -110,6 +110,19 @@ class Ball < Sprite
       hit.vanish
       self.y -= @dy
       @dy *= -1
+      GAME_INFO[:score] += 100
+    end
+
+    if self.y > Y_HEIGHT
+      GAME_INFO[:life] -= 1
+      if GAME_INFO[:life] > 0 
+        self.y = Y_HEIGHT - 40
+        @dx = rand(1..5)
+        @dy *= -1
+        GAME_INFO[:scene] = :title
+      else
+        GAME_INFO[:scene] = :gameover
+      end
     end
   end
 end
@@ -139,6 +152,17 @@ Window.load_resources do
       ball.update(walls, bar, blocks)
       ball.draw
       blocks.draw
+    when :gameover
+      Window.draw_font((X_WIDTH / 5) * 2, (Y_HEIGHT - 50) / 3, " GAME OVER ", Font.default)
+      Window.draw_font((X_WIDTH / 5)  * 2, (Y_HEIGHT - 50) / 2, "RETRY:SPACE", Font.default)
+      if Input.key_push?(K_SPACE)
+        GAME_INFO[:score] = 0
+        GAME_INFO[:life] = 5
+        GAME_INFO[:scene] = :title
+        Ball.new
+        Bar.new
+        Blocks.new
+      end
     end
   end
 end 
