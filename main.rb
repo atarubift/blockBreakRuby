@@ -44,7 +44,7 @@ class Wall < Sprite
   def initialize(x, y, dx, dy)
     self.x = x
     self.y = y
-    self.image = Image.new(dx, dy, C_WHITE)
+    self.image = Image.new(dx, dy, C_BLACK)
     super(x, y, image)
   end
 end
@@ -127,42 +127,65 @@ class Ball < Sprite
   end
 end
 
-Window.load_resources do
+class Game
+  def initialize
+    reset
+  end
 
-  walls = Walls.new
-  bar = Bar.new
-  walls = Walls.new
-  ball = Ball.new
-  blocks = Blocks.new
-  Window.loop do
-    Window.draw_box_fill(0, 0, X_WIDTH, 50, [128, 128, 128] )
-    Window.draw_font(0, 25, "SCOER: #{GAME_INFO[:score]} LIFE: #{"●" * GAME_INFO[:life]}", Font.default)
-   Window.draw_box_fill(0, 50, X_WIDTH, Y_HEIGHT, [0, 0, 0])
+  def reset
+    @walls = Walls.new
+    @blocks = Blocks.new
+    resetPlace
+    GAME_INFO[:scene] = :title
+    GAME_INFO[:score] = 0
+    GAME_INFO[:life] = 5
+  end
 
-    case GAME_INFO[:scene]
-    when :title
-      Window.draw_font((X_WIDTH / 5) * 2, (Y_HEIGHT - 50) / 2, "PRESS SPACE", Font.default)
-      if Input.key_push?(K_SPACE)
-        GAME_INFO[:scene] = :playing
-      end
-    when :playing
-      walls.draw
-      bar.update
-      bar.draw
-      ball.update(walls, bar, blocks)
-      ball.draw
-      blocks.draw
-    when :gameover
-      Window.draw_font((X_WIDTH / 5) * 2, (Y_HEIGHT - 50) / 3, " GAME OVER ", Font.default)
-      Window.draw_font((X_WIDTH / 5)  * 2, (Y_HEIGHT - 50) / 2, "RETRY:SPACE", Font.default)
-      if Input.key_push?(K_SPACE)
-        GAME_INFO[:score] = 0
-        GAME_INFO[:life] = 5
-        GAME_INFO[:scene] = :title
-        Ball.new
-        Bar.new
-        Blocks.new
+  def resetPlace
+    @bar = Bar.new
+    @ball = Ball.new
+  end
+
+  def run
+    Window.loop do
+      Window.draw_box_fill(0, 0, X_WIDTH, 50, [128, 128, 128] )
+      Window.draw_font(0, 25, "SCOER: #{GAME_INFO[:score]} LIFE: #{"●" * GAME_INFO[:life]}", Font.default)
+      Window.draw_box_fill(0, 50, X_WIDTH, Y_HEIGHT, [0, 0, 0])
+
+      case GAME_INFO[:scene]
+      when :title
+        resetPlace
+        Window.draw_font((X_WIDTH / 5) * 2, (Y_HEIGHT - 50) / 2, "PRESS SPACE", Font.default)
+        if Input.key_push?(K_SPACE)
+          GAME_INFO[:scene] = :playing
+        end
+      when :playing
+        @walls.draw
+        @bar.update
+        @bar.draw
+        @ball.update(@walls, @bar, @blocks)
+        @ball.draw
+        @blocks.draw
+        if GAME_INFO[:score] == 7000
+          GAME_INFO[:scene] = :clear
+        end
+      when :gameover
+        Window.draw_font((X_WIDTH / 5) * 2, (Y_HEIGHT - 50) / 3, " GAME OVER ", Font.default)
+        Window.draw_font((X_WIDTH / 5)  * 2, (Y_HEIGHT - 50) / 2, "RETRY:SPACE", Font.default)
+        if Input.key_push?(K_SPACE)
+          reset
+        end
+      when :clear
+        Window.draw_font((X_WIDTH / 5) * 2, (Y_HEIGHT - 50) / 2, "Congratulation!", Font.default)
+        if Input.key_push?(K_SPACE)
+          reset
+        end
       end
     end
   end
+end
+
+Window.load_resources do
+  game = Game.new
+  game.run
 end 
